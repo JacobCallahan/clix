@@ -1,0 +1,12 @@
+    def ~~method_name~~(self, _flags=None, **kwargs):
+        """Helper for ~~SubCommand Name~~'s ~~method name~~ method.
+
+        :param kwargs: Arguments to pass to the cli.
+
+        """
+        _options = [
+~~options~~
+        ]
+        # !!!! kwargs = clean_options(kwargs)
+        if self._in_options(_options, kwargs):
+            return self._execute("~~command~~", kwargs, _flags=_flags)

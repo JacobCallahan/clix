@@ -1,0 +1,9 @@
+class ~~SubCommandClass~~(~~CLIBaseClass~~):
+    """A representation of a ~~SubCommand Name~~ entity."""
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._command = "~~command path~~"
+        self._options.extend([
+~~class command options~~
+        ])
+~~subclass assignments~~~~sub classes~~~~sub commands~~
