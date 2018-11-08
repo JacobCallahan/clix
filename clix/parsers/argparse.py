@@ -12,10 +12,11 @@ from logzero import logger
 
 
 @attr.s()
-class ArgParse():
+class ArgParse:
     """Parser class for Ruby's APIPie apidoc generator"""
+
     _data = attr.ib(default={}, repr=False)
-    suffix = '--help'
+    suffix = "--help"
 
     def yaml_format(self, data):
         """compile all data into a yaml-compatible dict
@@ -27,24 +28,24 @@ class ArgParse():
     @staticmethod
     def process_help_text(help_text):
         """Iterate through each line of help text and pull into categories"""
-        sub_commands, options, category = [], [], 'skip'
-        for line in help_text.split('\n'):
-            if 'help' in line:
+        sub_commands, options, category = [], [], "skip"
+        for line in help_text.split("\n"):
+            if "help" in line:
                 continue
-            elif line and category == 'sub commands':
+            elif line and category == "sub commands":
                 sub_commands.append(line.strip().split()[0])
-            elif '--' in line and category == 'options':
-                line = line.split('--')[1]
+            elif "--" in line and category == "options":
+                line = line.split("--")[1]
                 options.append(line.split()[0])
-            elif line == 'Subcommands:':
-                logger.debug('Changing category to debug.')
-                category = 'sub commands'
-            elif line == 'Options:':
-                logger.debug('Changing category to options.')
-                category = 'options'
-            elif category == 'options':
+            elif line == "Subcommands:":
+                logger.debug("Changing category to debug.")
+                category = "sub commands"
+            elif line == "Options:":
+                logger.debug("Changing category to options.")
+                category = "options"
+            elif category == "options":
                 continue  # handle the case of multi-line helps
             else:
-                category = 'skip'
-        logger.debug(f'sub Commands: {sub_commands}, Options: {options}')
+                category = "skip"
+        logger.debug(f"sub Commands: {sub_commands}, Options: {options}")
         return sub_commands, options

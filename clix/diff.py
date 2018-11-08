@@ -27,7 +27,8 @@ class VersionDiff:
             # get the version before ver1
             self.ver2 = get_previous(self.cli_name, self.ver1, self.mock)
 
-    def _truncate(self, diff_dict):
+    @staticmethod
+    def _truncate(diff_dict):
         """Strip all extra information from a diff"""
         logger.debug(f"compacting: {diff_dict}")
         if not isinstance(diff_dict, dict):
@@ -37,7 +38,9 @@ class VersionDiff:
             compact_diff[parent] = []
             if children.get("sub_commands"):
                 for meth, component in children["sub_commands"].items():
-                    compact_diff[parent].append(self._truncate({meth: component}))
+                    compact_diff[parent].append(
+                        VersionDiff._truncate({meth: component})
+                    )
         # we want to avoid ugly empty lists in the output.
         if not any(child for child in compact_diff.values()):
             compact_list = []
@@ -58,6 +61,7 @@ class VersionDiff:
         if dict1 == dict2:
             return added, changed
         for key, values in dict1.items():
+            logger.debug(f"key: {key}, dict2: {dict2}")
             if key in dict2:
                 if not values == dict2[key]:
                     if isinstance(values, dict):
@@ -145,9 +149,9 @@ class VersionDiff:
         removed, _ = self._dict_diff(ver2_content, ver1_content)
         logger.debug("Determined removed content.")
         if self.compact:
-            added = self._truncate(added)
-            changed = self._truncate(changed)
-            removed = self._truncate(removed)
+            added = VersionDiff._truncate(added)
+            changed = VersionDiff._truncate(changed)
+            removed = VersionDiff._truncate(removed)
         self._vdiff = {
             f"Added in {self.ver1} since {self.ver2}": added,
             f"Changed in {self.ver1} since {self.ver2}": changed,

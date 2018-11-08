@@ -75,7 +75,9 @@ def get_ver_list(cli_name, mock=False):
     versions = [
         v_file.name.replace(".yaml", "")
         for v_file in save_path.iterdir()
-        if "-diff." not in v_file.name and ".yaml" in v_file.name
+        if "-diff." not in v_file.name
+        and "-comp." not in v_file.name
+        and ".yaml" in v_file.name
     ] or []
     return sorted(versions, reverse=True)
 

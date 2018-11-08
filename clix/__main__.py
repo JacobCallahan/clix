@@ -78,6 +78,11 @@ class Main(object):
             ),
         )
         parser.add_argument(
+            "--compact",
+            action="store_true",
+            help="Strip all the extra information from the results.",
+        )
+        parser.add_argument(
             "--debug", action="store_true", help="Enable debug loggin level."
         )
 
@@ -93,6 +98,7 @@ class Main(object):
             password=pword,
             parser=args.parser,
             max_sessions=args.max_sessions,
+            compact=args.compact,
         )
         explorer.explore()
         explorer.save_results()

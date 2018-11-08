@@ -16,7 +16,7 @@ def clean_options(options):
 
 class SSH:
     def __init__(
-        self, host="ibm-x3550m3-10.lab.eng.brq.redhat.com", auth=["root", "dog8code"]
+        self, host="ibm-x3250m4-04.lab.eng.rdu2.redhat.com", auth=["root", "dog8code"]
     ):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, 22))

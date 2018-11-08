@@ -7,6 +7,6 @@
         _options = [
 ~~options~~
         ]
-        # !!!! kwargs = clean_options(kwargs)
+        kwargs = clean_options(kwargs)
         if self._in_options(_options, kwargs):
             return self._execute("~~command~~", kwargs, _flags=_flags)

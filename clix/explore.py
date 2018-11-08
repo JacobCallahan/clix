@@ -22,6 +22,7 @@ class AsyncExplorer:
     max_sessions = attr.ib(default=10)
     adjust_max = attr.ib(default=True)
     parser = attr.ib(default=None)
+    compact = attr.ib(default=False)
     _data = attr.ib(default={}, repr=False)
 
     def __attrs_post_init__(self):
@@ -85,8 +86,13 @@ class AsyncExplorer:
         if not yaml_data:
             logger.warning("No data to be saved. Exiting.")
             return
+        if self.compact:
+            from clix.diff import VersionDiff
 
-        fpath = Path(f"CLIs/{self.name}/{self.version}.yaml")
+            yaml_data = VersionDiff._truncate(yaml_data["sub_commands"])
+            fpath = Path(f"CLIs/{self.name}/{self.version}-comp.yaml")
+        else:
+            fpath = Path(f"CLIs/{self.name}/{self.version}.yaml")
         if fpath.exists():
             logger.warning(f"{fpath} already exists. Deleting..")
             fpath.unlink()

@@ -3,7 +3,9 @@ from ssh2.session import Session
 
 
 class SSH:
-    def __init__(self, host="hp-ml350egen8-01.rhts.eng.bos.redhat.com", auth=["root", "dog8code"]):
+    def __init__(
+        self, host="hp-ml350egen8-01.rhts.eng.bos.redhat.com", auth=["root", "dog8code"]
+    ):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, 22))
         self.session = Session()
@@ -59,7 +61,7 @@ class Hammer:
             + ["--{} {}".format(name, value) for name, value in options.items()]
         )
         self._result = self.connection.run(cmd_string)
-        if int(self._result['status']) == 0:
+        if int(self._result["status"]) == 0:
             self._add_attributes(options)
 
 
