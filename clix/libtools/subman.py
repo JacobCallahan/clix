@@ -27,6 +27,18 @@ class CommandMaker:
             command_name = command_name[:-1]
         return "".join(x.capitalize() for x in command_name.split("-"))
 
+    @staticmethod
+    def get_opts(options):
+        """SubMan options often take the form of rhsmcertd.splay=RHSMCERTD.SPLAY
+            we want to turn that into rhsmcertd_splay
+        """
+        if not options:
+            return options
+        elif isinstance(options, list):
+            return [CommandMaker.get_opts(opt) for opt in options]
+        else:
+            return options.split("=")[0].replace(".", "_")
+
     def fill_subcommand_class_template(self, yaml_data, command_path=None):
         """Load and fill out a method template for every method"""
         command_path = command_path if command_path else self.cli_name
@@ -45,7 +57,7 @@ class CommandMaker:
         # fill the template for each method
         # construct the text that replaces ~~class command options~~
         class_command_options = "\n".join(
-            [f"'{opt}'," for opt in yaml_data.get("options", [])]
+            [f"'{self.get_opts(opt)}'," for opt in yaml_data.get("options", [])]
         )
         if class_command_options:
             class_command_options = "\n".join(class_command_options)
@@ -67,7 +79,7 @@ class CommandMaker:
                     self.fill_method_template(
                         self.name_to_proper_name(command_name),
                         sub_command,
-                        contents.get("options"),
+                        self.get_opts(contents.get("options")),
                     )
                 )
         subclass_assignments = [
@@ -144,7 +156,7 @@ class CommandMaker:
 
         logger.debug(f"Creating {self.cli_name}.py file.")
         compiled_options = "\n".join(
-            [f"'{opt}'," for opt in self.cli_dict[self.cli_name].get("options", [])]
+            [f"'{self.get_opts(opt)}'," for opt in self.cli_dict[self.cli_name].get("options", [])]
         )
 
         sub_classes, sub_methods = [], []
@@ -163,7 +175,7 @@ class CommandMaker:
             else:
                 sub_methods.append(
                     self.fill_method_template(
-                        self.cli_name, command, contents.get("options")
+                        self.cli_name, command, self.get_opts(contents.get("options"))
                     )
                 )
 
@@ -202,7 +214,7 @@ class CommandMaker:
             shift_text("\n".join([subclass[1] for subclass in sub_classes]), 0),
         )
 
-        save_file = Path(f"libs/generated/hammer/{self.cli_version}/{self.cli_name}.py")
+        save_file = Path(f"libs/generated/subscription-manager/{self.cli_version}/{self.cli_name}.py")
         if save_file.exists():
             logger.warning(f"Overwriting {save_file}")
             save_file.unlink()
@@ -215,7 +227,7 @@ class CommandMaker:
 
 
 @attr.s()
-class HammerMaker:
+class SubManMaker:
     cli_dict = attr.ib(repr=False)
     cli_name = attr.ib()
     cli_version = attr.ib()
