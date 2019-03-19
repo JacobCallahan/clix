@@ -8,7 +8,7 @@ import yaml
 
 import asyncssh
 from clix import helpers
-from clix.parsers import argparse, hammer
+from clix.parsers import argparse, hammer, subman
 from logzero import logger
 
 
@@ -34,8 +34,12 @@ class AsyncExplorer:
             self.parser = hammer.Hammer()
         elif self.parser.lower() == "argparse":
             self.parser = argparse.ArgParse()
+        elif self.parser.lower() == "subscription-manager":
+            self.parser = subman.SubMan()
         if not self.parser or isinstance(self.parser, str):
             logger.warning("No known parser specified! Please review documentation.")
+        logger.debug(f"Using parser {self.parser.__class__.__name__}")
+
         self.conn_args = {
             "host": self.host,
             "username": self.user,

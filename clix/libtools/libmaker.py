@@ -4,7 +4,7 @@ import attr
 from pathlib import Path
 from logzero import logger
 from clix import helpers
-from clix.libtools import hammer
+from clix.libtools import hammer, subman
 
 
 @attr.s()
@@ -24,16 +24,23 @@ class LibMaker:
         if not self.cli_version:
             self.cli_version = helpers.get_latest(self.cli_name)
 
-    def make_lib(self):
+        self.MakerClass = None
         if self.cli_name.lower() == "hammer":
-            logger.info(
-                f"Making a hammer library for {self.cli_version}"
-                " at libs/generated/hammer/"
-            )
-            cli_dict = helpers.load_cli(self.cli_name, self.cli_version)
-            hammer_maker = hammer.HammerMaker(
-                cli_dict=cli_dict, cli_name=self.cli_name, cli_version=self.cli_version
-            )
-            hammer_maker.make()
+            self.MakerClass = hammer.HammerMaker
+        elif self.cli_name.lower() == "subscription-manager":
+            self.MakerClass = subman.SubManMaker
         else:
             logger.warning(f"I don't know how to make a library for {self.cli_name}")
+
+    def make_lib(self):
+        if not self.MakerClass:
+            return
+        logger.info(
+            f"Making a {self.cli_name} library for {self.cli_version}"
+            f" at libs/generated/{self.cli_name}/"
+        )
+        cli_dict = helpers.load_cli(self.cli_name, self.cli_version)
+        lib_maker = self.MakerClass(
+            cli_dict=cli_dict, cli_name=self.cli_name, cli_version=self.cli_version
+        )
+        lib_maker.make()

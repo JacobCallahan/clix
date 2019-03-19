@@ -7,6 +7,7 @@ Requires ssh2-python
 """
 
 import socket
+import yaml
 from ssh2.session import Session
 
 
@@ -14,9 +15,17 @@ def clean_options(options):
     """replace _ with -"""
     return {opt.replace("_", "-"): val for opt, val in options.items()}
 
+def get_host():
+    """Read the hostname from the config.yaml file"""
+    hostname = None
+    with open("config.yaml", "r+") as cfg_file:
+        loaded = yaml.load(cfg_file)
+        hostname = loaded.get("hostname")
+    return hostname
+
 class SSH:
     def __init__(
-        self, host="ibm-x3250m4-04.lab.eng.rdu2.redhat.com", auth=["root", "dog8code"]
+        self, host=get_host(), auth=["root", "dog8code"]
     ):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, 22))

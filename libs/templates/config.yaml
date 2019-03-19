@@ -1,0 +1,3 @@
+# Copy this file to the same directory as your generated library
+# Change this to the host your library should target
+hostname: localhost

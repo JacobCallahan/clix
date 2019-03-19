@@ -11,6 +11,8 @@ from clix.helpers import get_cli_list, get_ver_list
 from clix import logger
 
 
+NICKS = {"sat6": "hammer", "satellite": "hammer", "subman": "subscription-manager"}
+
 class Main(object):
     """This main class will allow for better nested arguments (git stlye)"""
 
@@ -91,12 +93,12 @@ class Main(object):
             logger.setup_logzero(level="debug")
         user, pword = args.auth.split("/")
         explorer = AsyncExplorer(
-            name=args.cli_name,
+            name=NICKS.get(args.cli_name, args.cli_name),
             version=args.version,
             host=args.target_host,
             user=user,
             password=pword,
-            parser=args.parser,
+            parser=NICKS.get(args.parser, args.parser),
             max_sessions=args.max_sessions,
             compact=args.compact,
         )
@@ -140,7 +142,7 @@ class Main(object):
         if args.debug:
             logger.setup_logzero(level="debug")
         vdiff = VersionDiff(
-            cli_name=args.cli_name,
+            cli_name=NICKS.get(args.cli_name, args.cli_name),
             ver1=args.latest_version,
             ver2=args.previous_version,
             compact=args.compact,
@@ -172,7 +174,7 @@ class Main(object):
         args = parser.parse_args(sys.argv[2:])
         if args.debug:
             logger.setup_logzero(level="debug")
-        libmaker = LibMaker(cli_name=args.cli_name, cli_version=args.version)
+        libmaker = LibMaker(cli_name=NICKS.get(args.cli_name, args.cli_name), cli_version=args.version)
         libmaker.make_lib()
 
     def list(self):
@@ -195,12 +197,12 @@ class Main(object):
                 print("\n".join(results))
             else:
                 print("No CLIs have been explored.")
-        elif args.subject == "versions" and args.cli_name:
-            results = get_ver_list(args.cli_name)
+        elif args.subject == "versions" and NICKS.get(args.cli_name, args.cli_name):
+            results = get_ver_list(NICKS.get(args.cli_name, args.cli_name))
             if results:
                 print("\n".join(results))
             else:
-                print(f"No versions have been explored for {args.cli_name}.")
+                print(f"No versions have been explored for {NICKS.get(args.cli_name, args.cli_name)}.")
 
     def test(self):
         """List out some information about our entities and inputs."""
