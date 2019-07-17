@@ -12,6 +12,7 @@ class CommandMaker:
     cli_dict = attr.ib(repr=False)
     cli_name = attr.ib()
     cli_version = attr.ib()
+    data_dir = attr.ib(default=None)
 
     @staticmethod
     def name_to_proper_name(command_name):
@@ -219,10 +220,14 @@ class HammerMaker:
     cli_dict = attr.ib(repr=False)
     cli_name = attr.ib()
     cli_version = attr.ib()
+    data_dir = attr.ib(default=None)
 
     def make(self):
         """Make all the changes needed to create a hammer library version"""
         command_maker = CommandMaker(
-            self.cli_dict, clean_keywords(self.cli_name), self.cli_version
+            self.cli_dict,
+            clean_keywords(self.cli_name),
+            self.cli_version,
+            self.data_dir,
         )
         command_maker.create_library_file()
