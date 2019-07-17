@@ -13,6 +13,7 @@ from clix import logger
 
 NICKS = {"sat6": "hammer", "satellite": "hammer", "subman": "subscription-manager"}
 
+
 class Main(object):
     """This main class will allow for better nested arguments (git stlye)"""
 
@@ -40,7 +41,7 @@ class Main(object):
             "--cli-name",
             type=str,
             required=True,
-            help="The name of the command (satellite6).",
+            help="The name of the command (hammer).",
         )
         parser.add_argument(
             "-t",
@@ -80,6 +81,12 @@ class Main(object):
             ),
         )
         parser.add_argument(
+            "--data-dir",
+            type=str,
+            default="./",
+            help="The base directory in which to save exports.",
+        )
+        parser.add_argument(
             "--compact",
             action="store_true",
             help="Strip all the extra information from the results.",
@@ -100,6 +107,7 @@ class Main(object):
             password=pword,
             parser=NICKS.get(args.parser, args.parser),
             max_sessions=args.max_sessions,
+            data_dir=args.data_dir,
             compact=args.compact,
         )
         explorer.explore()
@@ -130,6 +138,12 @@ class Main(object):
             help="A previous version of the cli",
         )
         parser.add_argument(
+            "--data-dir",
+            type=str,
+            default="./",
+            help="The base directory in which to save diffs.",
+        )
+        parser.add_argument(
             "--compact",
             action="store_true",
             help="Strip all the extra information from the diff.",
@@ -145,6 +159,7 @@ class Main(object):
             cli_name=NICKS.get(args.cli_name, args.cli_name),
             ver1=args.latest_version,
             ver2=args.previous_version,
+            data_dir=args.data_dir,
             compact=args.compact,
         )
         vdiff.diff()
@@ -168,13 +183,23 @@ class Main(object):
             help="The cli version we're creating a library for (6.3).",
         )
         parser.add_argument(
+            "--data-dir",
+            type=str,
+            default="./",
+            help="The base directory in which to save libraries.",
+        )
+        parser.add_argument(
             "--debug", action="store_true", help="Enable debug loggin level."
         )
 
         args = parser.parse_args(sys.argv[2:])
         if args.debug:
             logger.setup_logzero(level="debug")
-        libmaker = LibMaker(cli_name=NICKS.get(args.cli_name, args.cli_name), cli_version=args.version)
+        libmaker = LibMaker(
+            cli_name=NICKS.get(args.cli_name, args.cli_name),
+            cli_version=args.version,
+            data_dir=args.data_dir,
+        )
         libmaker.make_lib()
 
     def list(self):
@@ -188,21 +213,32 @@ class Main(object):
             default=None,
             help="The name of the cli you want to list versions of.",
         )
+        parser.add_argument(
+            "--data-dir",
+            type=str,
+            default="./",
+            help="The base directory in which to search for saved exports.",
+        )
 
         args = parser.parse_args(sys.argv[2:])
 
         if args.subject == "clis":
-            results = get_cli_list()
+            results = get_cli_list(args.data_dir)
             if results:
                 print("\n".join(results))
             else:
-                print("No CLIs have been explored.")
+                print(f"No CLIs have been found in {args.data_dir}.")
         elif args.subject == "versions" and NICKS.get(args.cli_name, args.cli_name):
-            results = get_ver_list(NICKS.get(args.cli_name, args.cli_name))
+            results = get_ver_list(
+                NICKS.get(args.cli_name, args.cli_name), args.data_dir
+            )
             if results:
                 print("\n".join(results))
             else:
-                print(f"No versions have been explored for {NICKS.get(args.cli_name, args.cli_name)}.")
+                print(
+                    "No versions have been explored for "
+                    f"{NICKS.get(args.cli_name, args.cli_name)} in directory {args.data_dir}."
+                )
 
     def test(self):
         """List out some information about our entities and inputs."""

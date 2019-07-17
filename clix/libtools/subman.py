@@ -12,6 +12,7 @@ class CommandMaker:
     cli_dict = attr.ib(repr=False)
     cli_name = attr.ib()
     cli_version = attr.ib()
+    data_dir = attr.ib(default=None)
 
     @staticmethod
     def name_to_proper_name(command_name):
@@ -156,7 +157,10 @@ class CommandMaker:
 
         logger.debug(f"Creating {self.cli_name}.py file.")
         compiled_options = "\n".join(
-            [f"'{self.get_opts(opt)}'," for opt in self.cli_dict[self.cli_name].get("options", [])]
+            [
+                f"'{self.get_opts(opt)}',"
+                for opt in self.cli_dict[self.cli_name].get("options", [])
+            ]
         )
 
         sub_classes, sub_methods = [], []
@@ -214,7 +218,9 @@ class CommandMaker:
             shift_text("\n".join([subclass[1] for subclass in sub_classes]), 0),
         )
 
-        save_file = Path(f"libs/generated/subscription-manager/{self.cli_version}/{self.cli_name}.py")
+        save_file = Path(
+            f"{self.data_dir}libs/generated/subscription-manager/{self.cli_version}/{self.cli_name}.py"
+        )
         if save_file.exists():
             logger.warning(f"Overwriting {save_file}")
             save_file.unlink()
@@ -231,10 +237,14 @@ class SubManMaker:
     cli_dict = attr.ib(repr=False)
     cli_name = attr.ib()
     cli_version = attr.ib()
+    data_dir = attr.ib(default=None)
 
     def make(self):
         """Make all the changes needed to create a hammer library version"""
         command_maker = CommandMaker(
-            self.cli_dict, clean_keywords(self.cli_name), self.cli_version
+            self.cli_dict,
+            clean_keywords(self.cli_name),
+            self.cli_version,
+            self.data_dir,
         )
         command_maker.create_library_file()

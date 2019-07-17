@@ -22,6 +22,7 @@ class AsyncExplorer:
     max_sessions = attr.ib(default=10)
     adjust_max = attr.ib(default=True)
     parser = attr.ib(default=None)
+    data_dir = attr.ib(default=None)
     compact = attr.ib(default=False)
     _data = attr.ib(default={}, repr=False)
 
@@ -94,9 +95,9 @@ class AsyncExplorer:
             from clix.diff import VersionDiff
 
             yaml_data = VersionDiff._truncate(yaml_data["sub_commands"])
-            fpath = Path(f"CLIs/{self.name}/{self.version}-comp.yaml")
+            fpath = Path(f"{self.data_dir}CLIs/{self.name}/{self.version}-comp.yaml")
         else:
-            fpath = Path(f"CLIs/{self.name}/{self.version}.yaml")
+            fpath = Path(f"{self.data_dir}CLIs/{self.name}/{self.version}.yaml")
         if fpath.exists():
             logger.warning(f"{fpath} already exists. Deleting..")
             fpath.unlink()
