@@ -2,6 +2,11 @@
 History
 =======
 
+0.1.2(2019-07-17)
+=================
+
++ Added the ability to specify a data directory via --data-dir
+
 0.1.1(2018-11-08)
 =================
 
