@@ -48,9 +48,9 @@ KEYWORDS = [
 ]
 
 
-def get_cli_list(mock=False):
+def get_cli_list(data_dir=None, mock=False):
     """Return a list of saved CLIs, if they exist"""
-    cli_dir = Path("CLIs/" if not mock else "tests/CLIs/")
+    cli_dir = Path(f"{data_dir}CLIs/" if not mock else f"{data_dir}tests/CLIs/")
     # check exists
     if not cli_dir.exists():
         return None
@@ -62,12 +62,12 @@ def get_cli_list(mock=False):
     return clis
 
 
-def get_ver_list(cli_name, mock=False):
+def get_ver_list(cli_name, data_dir=None, mock=False):
     """Return a list of saved CLI versions, if they exist"""
     if mock:
-        save_path = Path(f"tests/CLIs/{cli_name}")
+        save_path = Path(f"{data_dir}tests/CLIs/{cli_name}")
     else:
-        save_path = Path(f"CLIs/{cli_name}")
+        save_path = Path(f"{data_dir}CLIs/{cli_name}")
     # check exists
     if not save_path.exists():
         return None
@@ -82,31 +82,31 @@ def get_ver_list(cli_name, mock=False):
     return sorted(versions, reverse=True)
 
 
-def get_latest(cli_name=None, mock=False):
+def get_latest(cli_name=None, data_dir=None, mock=False):
     """Get the latest CLI version, if it exists"""
     if not cli_name:
-        return get_cli_list(mock=mock)[0]
+        return get_cli_list(data_dir=data_dir, mock=mock)[0]
     else:
-        ver_list = get_ver_list(cli_name, mock=mock) or [None]
+        ver_list = get_ver_list(cli_name, data_dir, mock=mock) or [None]
         return ver_list[0]
 
 
-def get_previous(cli_name, version, mock=False):
+def get_previous(cli_name, version, data_dir=None, mock=False):
     """Get the CLI version before `version`, if it isn't last"""
-    cli_list = get_ver_list(cli_name, mock=mock)
-    if version in cli_list:
+    cli_list = get_ver_list(cli_name, data_dir, mock=mock)
+    if cli_list and version in cli_list:
         v_pos = cli_list.index(version)
         if v_pos + 2 <= len(cli_list):
             return cli_list[v_pos + 1]
     return None
 
 
-def load_cli(cli_name, version, mock=False):
+def load_cli(cli_name, version, data_dir=None, mock=False):
     """Load the saved yaml to dict, if the file exists"""
     if mock:
-        c_path = Path(f"tests/CLIs/{cli_name}/{version}.yaml")
+        c_path = Path(f"{data_dir}tests/CLIs/{cli_name}/{version}.yaml")
     else:
-        c_path = Path(f"CLIs/{cli_name}/{version}.yaml")
+        c_path = Path(f"{data_dir}CLIs/{cli_name}/{version}.yaml")
 
     if not c_path.exists():
         logger.warning(f"No file found at {c_path}!")

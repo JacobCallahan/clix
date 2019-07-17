@@ -13,7 +13,7 @@ requirements = ["aiofiles", "attrs", "asyncssh", "logzero", "pyyaml", "pytest"]
 
 setup(
     name="clix",
-    version="0.1.1",
+    version="0.1.2",
     description="CLI Explorer: Discover, Track, Test.",
     long_description=readme + "\n\n" + history,
     author="Jacob J Callahan",
@@ -27,7 +27,7 @@ setup(
     zip_safe=False,
     keywords="clix",
     classifiers=[
-        "Development Status :: 1 - Pre-Alpha",
+        "Development Status :: 2 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Natural Language :: English",
