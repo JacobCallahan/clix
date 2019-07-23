@@ -84,7 +84,7 @@ class CommandMaker:
         sub_classes = shift_text(
             "\n".join(sub_class[1] for sub_class in sub_classes), 1
         )
-        sub_commands = "\n".join(sub_commands)
+        sub_commands = shift_text("\n".join(sub_commands), 1)
 
         loaded_template = loaded_template.replace(
             "~~SubCommandClass~~", clean_keywords(self.name_to_class(command_name))
