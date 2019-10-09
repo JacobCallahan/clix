@@ -112,6 +112,7 @@ class Main(object):
         )
         explorer.explore()
         explorer.save_results()
+        sys.exit(0)
 
     def diff(self):
         """Determine the changes between two cli versions"""
@@ -164,6 +165,7 @@ class Main(object):
         )
         vdiff.diff()
         vdiff.save_diff()
+        sys.exit(0)
 
     def makelib(self):
         """Create a library to interact with a specific cli version"""
@@ -201,6 +203,7 @@ class Main(object):
             data_dir=args.data_dir,
         )
         libmaker.make_lib()
+        sys.exit(0)
 
     def list(self):
         """List out the cli information we have stored"""
@@ -239,6 +242,7 @@ class Main(object):
                     "No versions have been explored for "
                     f"{NICKS.get(args.cli_name, args.cli_name)} in directory {args.data_dir}."
                 )
+        sys.exit(0)
 
     def test(self):
         """List out some information about our entities and inputs."""
