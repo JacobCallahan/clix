@@ -7,7 +7,7 @@ from clix.explore import AsyncExplorer
 from clix.diff import VersionDiff
 
 from clix.libtools.libmaker import LibMaker
-from clix.helpers import get_cli_list, get_ver_list
+from clix.helpers import get_cli_list, get_ver_list, LooseVersion
 from clix import logger
 
 
@@ -98,6 +98,11 @@ class Main(object):
         args = parser.parse_args(sys.argv[2:])
         if args.debug:
             logger.setup_logzero(level="debug")
+        try:
+            LooseVersion(args.version)
+        except ValueError as err:
+            logger.error(err)
+            sys.exit(1)
         user, pword = args.auth.split("/")
         explorer = AsyncExplorer(
             name=NICKS.get(args.cli_name, args.cli_name),
