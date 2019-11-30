@@ -29,7 +29,7 @@ class AsyncExplorer:
     def __attrs_post_init__(self):
         """do some things"""
         if not self.version:
-            self.version = time.strftime("%Y-%m-%d", time.localtime())
+            self.version = time.strftime("%Y.%m.%d", time.localtime())
         # choose the correct parser class from known parsers
         if self.parser.lower() == "hammer":
             self.parser = hammer.Hammer()
