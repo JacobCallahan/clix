@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 """A collection of miscellaneous helpers that don't quite fit in."""
 import asyncio
+import re
+from distutils.version import StrictVersion
 from pathlib import Path
 from time import sleep
 from uuid import uuid4
@@ -48,17 +50,23 @@ KEYWORDS = [
 ]
 
 
+class LooseVersion(StrictVersion):
+    """This class adds the characters 's' and '-' to those allowed by StrictVersion"""
+
+    version_re = re.compile(
+        r"^(\d+) \. (\d+) (\. (\d+))? ([abs-](\d+))?$", re.VERBOSE | re.ASCII
+    )
+
+
 def get_cli_list(data_dir=None, mock=False):
     """Return a list of saved CLIs, if they exist"""
     cli_dir = Path(f"{data_dir}CLIs/" if not mock else f"{data_dir}tests/CLIs/")
     # check exists
     if not cli_dir.exists():
         return None
-    # get all versions in directory, that aren't diffs
-    clis = [
-        (cli.name, cli.stat().st_mtime) for cli in cli_dir.iterdir() if cli.is_dir()
-    ] or []
-    clis = [cli for cli, _ in sorted(clis, key=lambda x: x[1], reverse=True)]
+    # get all cli names, which are directories
+    clis = [cli.name for cli in cli_dir.iterdir() if cli.is_dir()] or []
+    clis.sort(reverse=True)
     return clis
 
 
@@ -79,7 +87,12 @@ def get_ver_list(cli_name, data_dir=None, mock=False):
         and "-comp." not in v_file.name
         and ".yaml" in v_file.name
     ] or []
-    return sorted(versions, reverse=True)
+    try:
+        versions.sort(key=LooseVersion, reverse=True)
+    except ValueError as err:
+        logger.error(f"Encountered an invalid version number. Stopping\n{err}")
+        return None
+    return versions
 
 
 def get_latest(cli_name=None, data_dir=None, mock=False):
