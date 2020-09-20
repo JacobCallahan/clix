@@ -36,8 +36,9 @@ class Hammer:
             elif line and category == "sub commands":
                 sub_commands.append(line.strip().split()[0])
             elif "--" in line and category == "options":
-                line = line.split("--")[1]
-                options.append(line.split()[0])
+                line = line.split("--")[1].split()
+                if line:
+                    options.append(line[0])
             elif line == "Subcommands:":
                 logger.debug("Changing category to subcommands.")
                 category = "sub commands"
