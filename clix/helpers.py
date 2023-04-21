@@ -122,9 +122,22 @@ def load_cli(cli_name, version, data_dir=None, mock=False):
         c_path = Path(f"{data_dir}CLIs/{cli_name}/{version}.yaml")
 
     if not c_path.exists():
-        logger.warning(f"No file found at {c_path}!")
+        logger.warning(f"No file found at {c_path.absolute()}!")
         return None
-    return yaml.load(c_path.open("r")) or None
+    logger.info(f"Loading CLI from {c_path.absolute()}")
+    return yaml.load(c_path.open("r"), Loader=yaml.Loader) or None
+
+
+def save_cli(cli_name, version, cli_dict, data_dir=None, compact=False, mock=False):
+    """Save the dict to yaml"""
+    if mock:
+        c_path = Path(f"{data_dir}tests/CLIs/{cli_name}/{version}{'-comp' if compact else ''}.yaml")
+    else:
+        c_path = Path(f"{data_dir}CLIs/{cli_name}/{version}{'-comp' if compact else ''}.yaml")
+    c_path.parent.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Saving CLI to {c_path.absolute()}")
+    with c_path.open("w") as c_file:
+        yaml.dump(cli_dict, c_file, default_flow_style=False)
 
 
 def shift_text(text, shift):
