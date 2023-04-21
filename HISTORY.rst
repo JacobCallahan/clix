@@ -2,6 +2,14 @@
 History
 =======
 
+0.2.0(2023-04-21)
+=================
+
++ Refactored a few things
++ Modernized the repo a bit, getting rid of travis in favor of github actions
++ Moved to a click-based cli
++ Added a new compact subcommand to convert existing data to a compact format
+
 0.1.2(2019-07-17)
 =================
 
