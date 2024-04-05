@@ -1,8 +1,8 @@
-# -*- encoding: utf-8 -*-
 """This module provides the capability to create a new hammer version."""
+
 import attr
-from pathlib import Path
 from logzero import logger
+
 from clix import helpers
 from clix.libtools import hammer, subman
 

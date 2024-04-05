@@ -1,15 +1,14 @@
 import asyncio
-import sys
-import time
 from pathlib import Path
-
-import attr
-import yaml
+import time
 
 import asyncssh
+import attr
+from logzero import logger
+import yaml
+
 from clix import helpers
 from clix.parsers import argparse, hammer, subman
-from logzero import logger
 
 
 @attr.s()
@@ -50,7 +49,7 @@ class AsyncExplorer:
         self.sema = asyncio.Semaphore(value=self.max_sessions)
 
     async def scrape_help(self, prefix, sub=""):
-        prefix = "{} {}".format(prefix, sub) if sub else prefix
+        prefix = f"{prefix} {sub}" if sub else prefix
         command = " ".join([prefix, self.parser.suffix])
         logger.debug(prefix)
         await self.sema.acquire()
@@ -90,7 +89,7 @@ class AsyncExplorer:
         yaml_data = self.parser.yaml_format(self._data)
         if not yaml_data:
             logger.warning("No data to be saved. Exiting.")
-            return
+            return None
         if self.compact:
             from clix.diff import VersionDiff
 
@@ -130,9 +129,7 @@ class AsyncExplorer:
                     curr_vals[1], self.max_sessions, self.host, self.user, self.password
                 )
                 if not new_sess_val or not new_start_val:
-                    logger.warning(
-                        f"Unable to set session values. Reverting to {max_sess}."
-                    )
+                    logger.warning(f"Unable to set session values. Reverting to {max_sess}.")
                     self.max_sessions = max_sess
                     self.sema = asyncio.Semaphore(value=self.max_sessions)
                     self.adjust_max = False
@@ -142,9 +139,7 @@ class AsyncExplorer:
                 self.adjust_max = False
         # run the loop to explore the cli
         try:
-            asyncio.get_event_loop().run_until_complete(
-                self.scrape_help(prefix=self.name)
-            )
+            asyncio.get_event_loop().run_until_complete(self.scrape_help(prefix=self.name))
         except (OSError, asyncssh.Error) as exc:
             logger.warning(f"SSH connection failed: {exc}")
         # revert the session changes, if applied

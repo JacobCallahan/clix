@@ -1,9 +1,8 @@
-# -*- encoding: utf-8 -*-
 """Module handling internal and dependency logging."""
 import logging
-import logzero
-
 from pathlib import Path
+
+import logzero
 
 
 def setup_logzero(level="info", path="logs/clix.log"):
@@ -30,9 +29,7 @@ def setup_logzero(level="info", path="logs/clix.log"):
     formatter = logzero.LogFormatter(fmt=log_fmt)
     logzero.setup_default_logger(formatter=formatter)
     logzero.loglevel(level)
-    logzero.logfile(
-        path, loglevel=level, maxBytes=1e9, backupCount=3, formatter=formatter
-    )
+    logzero.logfile(path, loglevel=level, maxBytes=1e9, backupCount=3, formatter=formatter)
 
 
 setup_logzero()

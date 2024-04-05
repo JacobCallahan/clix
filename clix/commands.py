@@ -1,20 +1,19 @@
-# -*- encoding: utf-8 -*-
 """Main module for CLIx's interface."""
 import click
-from clix.explore import AsyncExplorer
+
+from clix import helpers, logger
 from clix.diff import VersionDiff
-
+from clix.explore import AsyncExplorer
 from clix.libtools.libmaker import LibMaker
-from clix import helpers
-from clix import logger
-
 
 NICKS = {"sat6": "hammer", "satellite": "hammer", "subman": "subscription-manager"}
 
 
 def _version():
     import pkg_resources
+
     return pkg_resources.get_distribution("clix").version
+
 
 @click.group()
 @click.version_option(version=_version())
@@ -30,6 +29,7 @@ def _version():
 def cli():
     """CLIx is a tool for exploring and diffing CLI tools."""
     pass
+
 
 @cli.command()
 @click.option(
@@ -179,6 +179,7 @@ def diff(cli_name, latest_version, previous_version, data_dir, compact):
     vdiff.diff()
     vdiff.save_diff()
 
+
 @cli.command()
 @click.option(
     "-n",
@@ -209,6 +210,7 @@ def makelib(cli_name, version, data_dir):
     )
     libmaker.make_lib()
 
+
 @cli.command()
 @click.argument("subject", type=click.Choice(["clis", "versions"]))
 @click.option(
@@ -233,9 +235,7 @@ def list(subject, cli_name, data_dir):
         else:
             print(f"No CLIs have been found in {data_dir}.")
     elif subject == "versions" and NICKS.get(cli_name, cli_name):
-        results = helpers.get_ver_list(
-            NICKS.get(cli_name, cli_name), data_dir
-        )
+        results = helpers.get_ver_list(NICKS.get(cli_name, cli_name), data_dir)
         if results:
             print("\n".join(results))
         else:
