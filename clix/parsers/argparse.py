@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 """
 Provides a class with methods that parse the cli correctly.
 
@@ -32,10 +31,10 @@ class ArgParse:
         for line in help_text.split("\n"):
             if "help" in line:
                 continue
-            elif line and category == "sub commands":
+            if line and category == "sub commands":
                 sub_commands.append(line.strip().split()[0])
             elif "--" in line and category == "options":
-                line = line.split("--")[1]
+                line = line.split("--")[1]  # noqa: PLW2901 - not used downstream
                 options.append(line.split()[0])
             elif line == "Subcommands:":
                 logger.debug("Changing category to debug.")

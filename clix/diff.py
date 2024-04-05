@@ -1,9 +1,10 @@
-# -*- encoding: utf-8 -*-
 """Determine the changes between two cli versions."""
-import attr
-import yaml
 from pathlib import Path
+
+import attr
 from logzero import logger
+import yaml
+
 from clix.helpers import get_latest, get_previous, load_cli
 
 
@@ -23,9 +24,7 @@ class VersionDiff:
             self.cli_name = get_latest(data_dir=self.data_dir, mock=self.mock)
         if not self.ver1:
             # get the latest saved version
-            self.ver1 = get_latest(
-                cli_name=self.cli_name, data_dir=self.data_dir, mock=self.mock
-            )
+            self.ver1 = get_latest(cli_name=self.cli_name, data_dir=self.data_dir, mock=self.mock)
         if not self.ver2:
             # get the version before ver1
             self.ver2 = get_previous(self.cli_name, self.ver1, self.data_dir, self.mock)
@@ -41,9 +40,7 @@ class VersionDiff:
             compact_diff[parent] = []
             if children.get("sub_commands"):
                 for meth, component in children["sub_commands"].items():
-                    compact_diff[parent].append(
-                        VersionDiff._truncate({meth: component})
-                    )
+                    compact_diff[parent].append(VersionDiff._truncate({meth: component}))
         # we want to avoid ugly empty lists in the output.
         if not any(child for child in compact_diff.values()):
             compact_list = []
@@ -66,7 +63,7 @@ class VersionDiff:
         for key, values in dict1.items():
             logger.debug(f"key: {key}, dict2: {dict2}")
             if key in dict2:
-                if not values == dict2[key]:
+                if values != dict2[key]:
                     if isinstance(values, dict):
                         res, chng = self._dict_diff(values, dict2[key])
                         if res:
@@ -87,7 +84,7 @@ class VersionDiff:
                 added[key] = values
         return added, changed
 
-    def _list_diff(self, list1, list2):
+    def _list_diff(self, list1, list2):  # noqa: PLR0912 (too many branches)
         """Recursively search a list for differences"""
         added, changed = [], []
         if list1 == list2:
@@ -126,20 +123,19 @@ class VersionDiff:
             #     if not found:
             #         logger.debug(f"Adding {item}")
             #         added.append(item)
-            else:
-                if item not in list2:
-                    logger.debug(f"Adding {item}")
-                    added.append(item)
+            elif item not in list2:
+                logger.debug(f"Adding {item}")
+                added.append(item)
         return added, changed
 
     def diff(self):
         """Determine the diff between ver1 and ver2"""
         if not self.ver1:
             logger.warning("No ver1 cli found.")
-            return None
+            return
         if not self.ver2:
             logger.warning("No ver2 cli found.")
-            return None
+            return
         logger.info(f"Performing diff between {self.ver1} and {self.ver2}")
 
         ver1_content = load_cli(self.cli_name, self.ver1, self.data_dir, self.mock)
@@ -165,17 +161,13 @@ class VersionDiff:
         """Save the currently stored diff"""
         if not self._vdiff:
             logger.warning("No data to be saved. Exiting.")
-            return
+            return None
 
         if self.mock:
-            fpath = Path(
-                f"tests/CLIs/{self.cli_name}/{self.ver2}-to-{self.ver1}-diff.yaml"
-            )
+            fpath = Path(f"tests/CLIs/{self.cli_name}/{self.ver2}-to-{self.ver1}-diff.yaml")
         else:
             ftype = "comp-diff" if self.compact else "diff"
-            fpath = Path(
-                f"CLIs/{self.cli_name}/{self.ver2}-to-{self.ver1}-{ftype}.yaml"
-            )
+            fpath = Path(f"CLIs/{self.cli_name}/{self.ver2}-to-{self.ver1}-{ftype}.yaml")
         if fpath.exists():
             fpath.unlink()
         # create the directory, if it doesn't exist

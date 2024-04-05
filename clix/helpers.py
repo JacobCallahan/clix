@@ -1,16 +1,14 @@
-# -*- encoding: utf-8 -*-
 """A collection of miscellaneous helpers that don't quite fit in."""
 import asyncio
-import re
-from distutils.version import StrictVersion
 from pathlib import Path
+import re
 from time import sleep
 from uuid import uuid4
 
-import yaml
-
 import asyncssh
 from logzero import logger
+from packaging.version import Version
+import yaml
 
 MODULE_DATA = {}  # not ideal, but async is funky
 KEYWORDS = [
@@ -50,12 +48,10 @@ KEYWORDS = [
 ]
 
 
-class LooseVersion(StrictVersion):
-    """This class adds the characters 's' and '-' to those allowed by StrictVersion"""
+class LooseVersion(Version):
+    """This class adds the characters 's' and '-' to those allowed by Version"""
 
-    version_re = re.compile(
-        r"^(\d+) \. (\d+) (\. (\d+))? ([abs-](\d+))?$", re.VERBOSE | re.ASCII
-    )
+    version_re = re.compile(r"^(\d+) \. (\d+) (\. (\d+))? ([abs-](\d+))?$", re.VERBOSE | re.ASCII)
 
 
 def get_cli_list(data_dir=None, mock=False):
@@ -83,9 +79,7 @@ def get_ver_list(cli_name, data_dir=None, mock=False):
     versions = [
         v_file.name.replace(".yaml", "")
         for v_file in save_path.iterdir()
-        if "-diff." not in v_file.name
-        and "-comp." not in v_file.name
-        and ".yaml" in v_file.name
+        if "-diff." not in v_file.name and "-comp." not in v_file.name and ".yaml" in v_file.name
     ] or []
     try:
         versions.sort(key=LooseVersion, reverse=True)
@@ -99,9 +93,8 @@ def get_latest(cli_name=None, data_dir=None, mock=False):
     """Get the latest CLI version, if it exists"""
     if not cli_name:
         return get_cli_list(data_dir=data_dir, mock=mock)[0]
-    else:
-        ver_list = get_ver_list(cli_name, data_dir, mock=mock) or [None]
-        return ver_list[0]
+    ver_list = get_ver_list(cli_name, data_dir, mock=mock) or [None]
+    return ver_list[0]
 
 
 def get_previous(cli_name, version, data_dir=None, mock=False):
@@ -131,7 +124,9 @@ def load_cli(cli_name, version, data_dir=None, mock=False):
 def save_cli(cli_name, version, cli_dict, data_dir=None, compact=False, mock=False):
     """Save the dict to yaml"""
     if mock:
-        c_path = Path(f"{data_dir}tests/CLIs/{cli_name}/{version}{'-comp' if compact else ''}.yaml")
+        c_path = Path(
+            f"{data_dir}tests/CLIs/{cli_name}/{version}{'-comp' if compact else ''}.yaml"
+        )
     else:
         c_path = Path(f"{data_dir}CLIs/{cli_name}/{version}{'-comp' if compact else ''}.yaml")
     c_path.parent.mkdir(parents=True, exist_ok=True)
@@ -176,9 +171,7 @@ async def _run_misc_cmd(key, cmd, host, user, pword):
 
 def run_misc_cmd(key, cmd, host, user, pword):
     try:
-        asyncio.get_event_loop().run_until_complete(
-            _run_misc_cmd(key, cmd, host, user, pword)
-        )
+        asyncio.get_event_loop().run_until_complete(_run_misc_cmd(key, cmd, host, user, pword))
     except (OSError, asyncssh.Error) as exc:
         logger.warning(f"SSH connection failed: {exc}")
         return False
@@ -201,8 +194,7 @@ def set_max_sessions(init_val, new_val, host, user, pword):
     sess_cmd = f"sed -i 's/{init_val}/{new_val}/' /etc/ssh/sshd_config"
     if run_misc_cmd(uuid4(), sess_cmd, host, user, pword):
         return new_val
-    else:
-        return False
+    return False
 
 
 def set_max_starts(init_val, new_val, host, user, pword):
@@ -211,8 +203,7 @@ def set_max_starts(init_val, new_val, host, user, pword):
     start_cmd = f"sed -i 's/{init_val}/{new_val}/' /etc/ssh/sshd_config"
     if run_misc_cmd(uuid4(), start_cmd, host, user, pword):
         return new_val
-    else:
-        return False
+    return False
 
 
 def restart_sshd(host, user, pword):
@@ -227,12 +218,10 @@ def restart_sshd(host, user, pword):
             else:
                 tries += 1
                 sleep(tries)
-        except:
-            pass
+        except Exception as exc:
+            logger.warning(f"Failed to restart sshd: {exc}")
     if success:
         logger.debug("sshd successfully restarted!")
     else:
-        logger.warning(
-            f"something went wrong while restarting sshd!\n{MODULE_DATA[restart_key]}"
-        )
+        logger.warning(f"something went wrong while restarting sshd!\n{MODULE_DATA[restart_key]}")
     return success

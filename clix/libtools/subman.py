@@ -1,9 +1,9 @@
-# -*- encoding: utf-8 -*-
 """This module provides the capability to create a new hammer version."""
-import attr
-import yaml
 from pathlib import Path
+
+import attr
 from logzero import logger
+
 from clix.helpers import clean_keywords, shift_text
 
 
@@ -31,14 +31,13 @@ class CommandMaker:
     @staticmethod
     def get_opts(options):
         """SubMan options often take the form of rhsmcertd.splay=RHSMCERTD.SPLAY
-            we want to turn that into rhsmcertd_splay
+        we want to turn that into rhsmcertd_splay
         """
         if not options:
             return options
-        elif isinstance(options, list):
+        if isinstance(options, list):
             return [CommandMaker.get_opts(opt) for opt in options]
-        else:
-            return options.split("=")[0].replace(".", "_")
+        return options.split("=")[0].replace(".", "_")
 
     def fill_subcommand_class_template(self, yaml_data, command_path=None):
         """Load and fill out a method template for every method"""
@@ -50,7 +49,7 @@ class CommandMaker:
         cmd_temp_f = Path("libs/templates/hammer/subcommand_class.template")
         if not cmd_temp_f.exists():
             logger.error(f"Unable to find {cmd_temp_f.absolute()}.")
-            return
+            return None
         loaded_template = None
         with cmd_temp_f.open("r+") as f_load:
             loaded_template = f_load.read()
@@ -93,9 +92,7 @@ class CommandMaker:
         else:
             subclass_assignments = ""
 
-        sub_classes = shift_text(
-            "\n".join(sub_class[1] for sub_class in sub_classes), 1
-        )
+        sub_classes = shift_text("\n".join(sub_class[1] for sub_class in sub_classes), 1)
         sub_commands = shift_text("\n".join(sub_commands), 1)
 
         loaded_template = loaded_template.replace(
@@ -111,42 +108,29 @@ class CommandMaker:
         loaded_template = loaded_template.replace(
             "~~class command options~~", class_command_options
         )
-        loaded_template = loaded_template.replace(
-            "~~subclass assignments~~", subclass_assignments
-        )
-        loaded_template = loaded_template.replace(
-            "~~sub classes~~", f"{sub_classes}\n\n"
-        )
-        loaded_template = loaded_template.replace("~~sub commands~~", sub_commands)
-        return loaded_template
+        loaded_template = loaded_template.replace("~~subclass assignments~~", subclass_assignments)
+        loaded_template = loaded_template.replace("~~sub classes~~", f"{sub_classes}\n\n")
+        return loaded_template.replace("~~sub commands~~", sub_commands)
 
     def fill_method_template(self, parent_name, command, options):
         """Fill out and return an method template, based on `command`"""
         logger.debug(f"Generating {parent_name}'s method: {command}")
-        if options:
-            compiled_options = "\n".join([f"'{opt}'," for opt in options])
-        else:
-            compiled_options = ""
+        compiled_options = "\n".join([f"'{opt}'," for opt in options]) if options else ""
         # load the template
         cmd_temp_f = Path("libs/templates/hammer/command_method.template")
         if not cmd_temp_f.exists():
             logger.error(f"Unable to find {cmd_temp_f.absolute()}.")
-            return
+            return None
         loaded_t = None
         with cmd_temp_f.open("r+") as f_load:
             loaded_t = f_load.read()
 
         # fill the template
-        loaded_t = loaded_t.replace(
-            "~~method_name~~", clean_keywords(command.replace("-", "_"))
-        )
+        loaded_t = loaded_t.replace("~~method_name~~", clean_keywords(command.replace("-", "_")))
         loaded_t = loaded_t.replace("~~SubCommand Name~~", parent_name)
-        loaded_t = loaded_t.replace(
-            "~~method name~~", self.name_to_proper_name(command)
-        )
+        loaded_t = loaded_t.replace("~~method name~~", self.name_to_proper_name(command))
         loaded_t = loaded_t.replace("~~options~~", shift_text(compiled_options, 3))
-        loaded_t = loaded_t.replace("~~command~~", command)
-        return loaded_t
+        return loaded_t.replace("~~command~~", command)
 
     def create_library_file(self):
         """Populate a library file with filled command templates"""
@@ -157,16 +141,11 @@ class CommandMaker:
 
         logger.debug(f"Creating {self.cli_name}.py file.")
         compiled_options = "\n".join(
-            [
-                f"'{self.get_opts(opt)}',"
-                for opt in self.cli_dict[self.cli_name].get("options", [])
-            ]
+            [f"'{self.get_opts(opt)}'," for opt in self.cli_dict[self.cli_name].get("options", [])]
         )
 
         sub_classes, sub_methods = [], []
-        for command, contents in (
-            self.cli_dict[self.cli_name].get("sub_commands", {}).items()
-        ):
+        for command, contents in self.cli_dict[self.cli_name].get("sub_commands", {}).items():
             if "sub_commands" in contents:
                 sub_classes.append(
                     [
@@ -204,12 +183,8 @@ class CommandMaker:
             "~~MainCommandClass~~", self.name_to_class(self.cli_name)
         )
         loaded_cmd_f = loaded_cmd_f.replace("~~main command~~", self.cli_name)
-        loaded_cmd_f = loaded_cmd_f.replace(
-            "~~command options~~", shift_text(compiled_options, 3)
-        )
-        loaded_cmd_f = loaded_cmd_f.replace(
-            "~~subclass assignments~~", subclass_assignments
-        )
+        loaded_cmd_f = loaded_cmd_f.replace("~~command options~~", shift_text(compiled_options, 3))
+        loaded_cmd_f = loaded_cmd_f.replace("~~subclass assignments~~", subclass_assignments)
         loaded_cmd_f = loaded_cmd_f.replace(
             "~~sub methods~~", shift_text("\n".join(sub_methods), 1)
         )

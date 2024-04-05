@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 """
 Provides a class with methods that parse the cli correctly.
 
@@ -31,16 +30,16 @@ class SubMan:
         """Iterate through each line of help text and pull into categories"""
         sub_commands, options, category = [], [], "skip"
         for line in help_text.splitlines():
-            line = line.strip()
+            line = line.strip()  # noqa: PLW2901 - want to clean extra spaces
             if "help" in line or not line:
                 continue
-            elif " Modules:" in line:
+            if " Modules:" in line:
                 logger.debug("Changing category to subcommands.")
                 category = "sub commands"
             elif line and category == "sub commands":
                 sub_commands.append(line.split()[0])
             elif "--" in line and category == "options":
-                line = line.split("--")[1]
+                line = line.split("--")[1]  # noqa: PLW2901 - not used downstream
                 options.append(line.split()[0])
             elif line == "Options:":
                 logger.debug("Changing category to options.")

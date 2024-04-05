@@ -1,11 +1,10 @@
 import socket
+
 from ssh2.session import Session
 
 
 class SSH:
-    def __init__(
-        self, host="hp-ml350egen8-01.rhts.eng.bos.redhat.com", auth=["root", "dog8code"]
-    ):
+    def __init__(self, host="hp-ml350egen8-01.rhts.eng.bos.redhat.com", auth=("root", "dog8code")):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, 22))
         self.session = Session()
@@ -27,7 +26,7 @@ class SSH:
 
 
 class OptionException(BaseException):
-    def __init__(self, bad_options=[]):
+    def __init__(self, bad_options=None):
         super().__init__(f"Received unexpected option(s): {bad_options}")
 
 
@@ -46,7 +45,7 @@ class Hammer:
 
     def _in_options(self, options=None, attributes=None):
         options = self._options if not options else options + self._options
-        errs = [arg for arg in attributes.keys() if arg not in options]
+        errs = [arg for arg in attributes if arg not in options]
         if errs:
             raise OptionException(errs)
         return True
@@ -57,8 +56,7 @@ class Hammer:
 
     def _execute(self, sub_command, options):
         cmd_string = " ".join(
-            [self._command, sub_command]
-            + ["--{} {}".format(name, value) for name, value in options.items()]
+            [self._command, sub_command] + [f"--{name} {value}" for name, value in options.items()]
         )
         self._result = self.connection.run(cmd_string)
         if int(self._result["status"]) == 0:
