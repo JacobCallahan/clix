@@ -1,18 +1,17 @@
 """This module provides the capability to create a new hammer version."""
 from pathlib import Path
 
-import attr
 from logzero import logger
 
 from clix.helpers import clean_keywords, shift_text
 
 
-@attr.s()
 class CommandMaker:
-    cli_dict = attr.ib(repr=False)
-    cli_name = attr.ib()
-    cli_version = attr.ib()
-    data_dir = attr.ib(default=None)
+    def __init__(self, cli_dict, cli_name, cli_version, data_dir=None):
+        self.cli_dict = cli_dict
+        self.cli_name = cli_name
+        self.cli_version = cli_version
+        self.data_dir = data_dir
 
     @staticmethod
     def name_to_proper_name(command_name):
@@ -49,7 +48,7 @@ class CommandMaker:
         cmd_temp_f = Path("libs/templates/hammer/subcommand_class.template")
         if not cmd_temp_f.exists():
             logger.error(f"Unable to find {cmd_temp_f.absolute()}.")
-            return None
+            return
         loaded_template = None
         with cmd_temp_f.open("r+") as f_load:
             loaded_template = f_load.read()
@@ -120,7 +119,7 @@ class CommandMaker:
         cmd_temp_f = Path("libs/templates/hammer/command_method.template")
         if not cmd_temp_f.exists():
             logger.error(f"Unable to find {cmd_temp_f.absolute()}.")
-            return None
+            return
         loaded_t = None
         with cmd_temp_f.open("r+") as f_load:
             loaded_t = f_load.read()
@@ -207,12 +206,12 @@ class CommandMaker:
             outfile.write(loaded_cmd_f)
 
 
-@attr.s()
 class SubManMaker:
-    cli_dict = attr.ib(repr=False)
-    cli_name = attr.ib()
-    cli_version = attr.ib()
-    data_dir = attr.ib(default=None)
+    def __init__(self, cli_dict, cli_name, cli_version, data_dir=None):
+        self.cli_dict = cli_dict
+        self.cli_name = cli_name
+        self.cli_version = cli_version
+        self.data_dir = data_dir
 
     def make(self):
         """Make all the changes needed to create a hammer library version"""

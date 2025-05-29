@@ -1,19 +1,17 @@
 """This module provides the capability to create a new hammer version."""
 
-import attr
 from logzero import logger
 
 from clix import helpers
 from clix.libtools import hammer, subman
 
 
-@attr.s()
 class LibMaker:
-    cli_name = attr.ib(default=None)
-    cli_version = attr.ib(default=None)
-    data_dir = attr.ib(default=None)
+    def __init__(self, cli_name=None, cli_version=None, data_dir=None):
+        self.cli_name = cli_name
+        self.cli_version = cli_version
+        self.data_dir = data_dir
 
-    def __attrs_post_init__(self):
         if not self.cli_name:
             clis = helpers.get_cli_list(data_dir=self.data_dir)
             if clis:

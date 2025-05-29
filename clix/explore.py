@@ -3,7 +3,6 @@ from pathlib import Path
 import time
 
 import asyncssh
-import attr
 from logzero import logger
 import yaml
 
@@ -11,21 +10,20 @@ from clix import helpers
 from clix.parsers import argparse, hammer, subman
 
 
-@attr.s()
 class AsyncExplorer:
-    name = attr.ib(default=None)
-    version = attr.ib(default=None)
-    host = attr.ib(default=None)
-    user = attr.ib(default=None)
-    password = attr.ib(default=None)
-    max_sessions = attr.ib(default=10)
-    adjust_max = attr.ib(default=True)
-    parser = attr.ib(default=None)
-    data_dir = attr.ib(default=None)
-    compact = attr.ib(default=False)
-    _data = attr.ib(default={}, repr=False)
+    def __init__(self, name=None, version=None, host=None, user=None, password=None, max_sessions=10, adjust_max=True, parser=None, data_dir=None, compact=False):
+        self.name = name
+        self.version = version
+        self.host = host
+        self.user = user
+        self.password = password
+        self.max_sessions = max_sessions
+        self.adjust_max = adjust_max
+        self.parser = parser
+        self.data_dir = data_dir
+        self.compact = compact
+        self._data = {}
 
-    def __attrs_post_init__(self):
         """do some things"""
         if not self.version:
             self.version = time.strftime("%Y.%m.%d", time.localtime())
@@ -89,7 +87,7 @@ class AsyncExplorer:
         yaml_data = self.parser.yaml_format(self._data)
         if not yaml_data:
             logger.warning("No data to be saved. Exiting.")
-            return None
+            return
         if self.compact:
             from clix.diff import VersionDiff
 

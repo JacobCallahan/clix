@@ -6,16 +6,15 @@ Parser classes must currently implement the following methods:
     yaml_format - Returns yaml-friendly dict of the compiled data.
     scrape_content - Returns a dict of params and paths from a single page.
 """
-import attr
 from logzero import logger
 
 
-@attr.s()
 class ArgParse:
     """Parser class for Ruby's APIPie apidoc generator"""
 
-    _data = attr.ib(default={}, repr=False)
-    suffix = "--help"
+    def __init__(self):
+        self._data = {}
+        self.suffix = "--help"
 
     def yaml_format(self, data):
         """compile all data into a yaml-compatible dict
