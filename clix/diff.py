@@ -1,25 +1,23 @@
 """Determine the changes between two cli versions."""
 from pathlib import Path
 
-import attr
 from logzero import logger
 import yaml
 
 from clix.helpers import get_latest, get_previous, load_cli
 
 
-@attr.s()
 class VersionDiff:
-    cli_name = attr.ib(default=None)
-    ver1 = attr.ib(default=None)
-    ver2 = attr.ib(default=None)
-    data_dir = attr.ib(default=None)
-    compact = attr.ib(default=False)
-    mock = attr.ib(default=False, repr=False)
-    _vdiff = attr.ib(default={})
+    def __init__(self, cli_name=None, ver1=None, ver2=None, data_dir=None, compact=False, mock=False):
+        self.cli_name = cli_name
+        self.ver1 = ver1
+        self.ver2 = ver2
+        self.data_dir = data_dir
+        self.compact = compact
+        self.mock = mock
+        self._vdiff = {}
 
-    def __attrs_post_init__(self):
-        """Load the cli versions, if not provided"""
+        # Logic from __attrs_post_init__
         if not self.cli_name:
             self.cli_name = get_latest(data_dir=self.data_dir, mock=self.mock)
         if not self.ver1:
@@ -161,7 +159,7 @@ class VersionDiff:
         """Save the currently stored diff"""
         if not self._vdiff:
             logger.warning("No data to be saved. Exiting.")
-            return None
+            return
 
         if self.mock:
             fpath = Path(f"tests/CLIs/{self.cli_name}/{self.ver2}-to-{self.ver1}-diff.yaml")

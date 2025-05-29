@@ -21,7 +21,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "attrs", 
     "asyncssh", 
     "click",
     "logzero", 

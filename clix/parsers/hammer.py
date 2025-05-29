@@ -7,16 +7,15 @@ Parser classes must currently implement the following methods:
 
 Additionally, each parser class must have a suffix
 """
-import attr
 from logzero import logger
 
 
-@attr.s()
 class Hammer:
     """Parser class for Ruby's APIPie apidoc generator"""
 
-    _data = attr.ib(default={}, repr=False)
-    suffix = "--help"
+    def __init__(self):
+        self._data = {}
+        self.suffix = "--help"
 
     def yaml_format(self, data):
         """compile all data into a yaml-compatible dict
