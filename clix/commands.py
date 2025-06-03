@@ -1,5 +1,7 @@
 """Main module for CLIx's interface."""
-import click
+from rich.console import Console
+from rich.table import Table
+import rich_click as click
 
 from clix import helpers, logger
 from clix.diff import VersionDiff
@@ -228,18 +230,27 @@ def makelib(cli_name, version, data_dir):
 )
 def list(subject, cli_name, data_dir):
     """List out the cli information we have stored"""
+    console = Console()
     if subject == "clis":
         results = helpers.get_cli_list(data_dir)
         if results:
-            print("\n".join(results))
+            table = Table(title="Available CLIs")
+            table.add_column("CLI Name", style="cyan")
+            for cli_name_result in results:
+                table.add_row(cli_name_result)
+            console.print(table)
         else:
-            print(f"No CLIs have been found in {data_dir}.")
+            console.print(f"No CLIs have been found in {data_dir}.")
     elif subject == "versions" and NICKS.get(cli_name, cli_name):
         results = helpers.get_ver_list(NICKS.get(cli_name, cli_name), data_dir)
         if results:
-            print("\n".join(results))
+            table = Table(title=f"Available Versions for {NICKS.get(cli_name, cli_name)}")
+            table.add_column("Version", style="cyan")
+            for version in results:
+                table.add_row(version)
+            console.print(table)
         else:
-            print(
+            console.print(
                 "No versions have been explored for "
                 f"{NICKS.get(cli_name, cli_name)} in directory {data_dir}."
             )

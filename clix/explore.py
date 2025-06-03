@@ -11,7 +11,19 @@ from clix.parsers import argparse, hammer, subman
 
 
 class AsyncExplorer:
-    def __init__(self, name=None, version=None, host=None, user=None, password=None, max_sessions=10, adjust_max=True, parser=None, data_dir=None, compact=False):
+    def __init__(
+        self,
+        name=None,
+        version=None,
+        host=None,
+        user=None,
+        password=None,
+        max_sessions=10,
+        adjust_max=True,
+        parser=None,
+        data_dir=None,
+        compact=False,
+    ):
         self.name = name
         self.version = version
         self.host = host
@@ -87,7 +99,7 @@ class AsyncExplorer:
         yaml_data = self.parser.yaml_format(self._data)
         if not yaml_data:
             logger.warning("No data to be saved. Exiting.")
-            return
+            return None
         if self.compact:
             from clix.diff import VersionDiff
 

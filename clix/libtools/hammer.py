@@ -37,7 +37,7 @@ class CommandMaker:
         cmd_temp_f = Path("libs/templates/hammer/subcommand_class.template")
         if not cmd_temp_f.exists():
             logger.error(f"Unable to find {cmd_temp_f.absolute()}.")
-            return
+            return None
         loaded_template = None
         with cmd_temp_f.open("r+") as f_load:
             loaded_template = f_load.read()
@@ -106,7 +106,7 @@ class CommandMaker:
         cmd_temp_f = Path("libs/templates/hammer/command_method.template")
         if not cmd_temp_f.exists():
             logger.error(f"Unable to find {cmd_temp_f.absolute()}.")
-            return
+            return None
         loaded_t = None
         with cmd_temp_f.open("r+") as f_load:
             loaded_t = f_load.read()
