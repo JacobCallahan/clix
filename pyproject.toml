@@ -26,7 +26,8 @@ dependencies = [
     "logzero", 
     "packaging", 
     "pyyaml", 
-    "setuptools"
+    "setuptools",
+    "rich-click"
 ]
 dynamic = ["version"]
 

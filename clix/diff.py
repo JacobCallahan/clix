@@ -8,7 +8,9 @@ from clix.helpers import get_latest, get_previous, load_cli
 
 
 class VersionDiff:
-    def __init__(self, cli_name=None, ver1=None, ver2=None, data_dir=None, compact=False, mock=False):
+    def __init__(
+        self, cli_name=None, ver1=None, ver2=None, data_dir=None, compact=False, mock=False
+    ):
         self.cli_name = cli_name
         self.ver1 = ver1
         self.ver2 = ver2
@@ -159,7 +161,7 @@ class VersionDiff:
         """Save the currently stored diff"""
         if not self._vdiff:
             logger.warning("No data to be saved. Exiting.")
-            return
+            return None
 
         if self.mock:
             fpath = Path(f"tests/CLIs/{self.cli_name}/{self.ver2}-to-{self.ver1}-diff.yaml")

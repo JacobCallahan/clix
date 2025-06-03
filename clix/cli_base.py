@@ -1,5 +1,6 @@
 import socket
 
+from rich import print
 from ssh2.session import Session
 
 
@@ -13,7 +14,7 @@ class SSH:
 
     def run(self, command):
         """run a command on the host and return the results"""
-        print(command)
+        print(f"[bold blue]Executing command:[/] {command}")
         channel = self.session.open_session()
         channel.execute(command)
         size, data = channel.read()
