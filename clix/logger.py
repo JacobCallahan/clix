@@ -1,35 +1,72 @@
 """Module handling internal and dependency logging."""
 import logging
 from pathlib import Path
+import sys
 
-import logzero
+from loguru import logger
 
 
-def setup_logzero(level="info", path="logs/clix.log"):
-    log_fmt = "%(color)s[%(levelname)s %(asctime)s]%(end_color)s %(message)s"
-    if level == "debug":
-        level = logging.DEBUG
-        log_fmt = (
-            "%(color)s[%(levelname)1.1s %(asctime)s %(module)s:%(lineno)d]"
-            "%(end_color)s %(message)s"
-        )
-    elif level == "info":
-        level = logging.INFO
-    elif level == "warning":
-        level = logging.WARNING
-    elif level == "error":
-        level = logging.ERROR
-    elif level == "critical":
-        level = logging.CRITICAL
+def setup_loguru(level="INFO", path="logs/clix.log"):
+    """Set up loguru logger."""
+    logger.remove()  # Remove default handler
 
+    log_format = (
+        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+        "<level>{level: <8}</level> | "
+        "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>"
+        " - <level>{message}</level>"
+    )
+
+    # Console logger
+    logger.add(
+        sys.stderr,
+        level=level.upper(),
+        format=log_format,
+        colorize=True,
+    )
+
+    # File logger
     # create the directory if it doesn't exist
-    # https://github.com/metachris/logzero/issues/129
     Path(path).parent.mkdir(parents=True, exist_ok=True)
+    logger.add(
+        path,
+        level=level.upper(),
+        format=log_format,
+        rotation="10 MB",  # Corresponds to maxBytes=1e7, using 10 MB for simplicity
+        retention="3 days",  # Corresponds to backupCount=3, assuming daily logs
+        enqueue=True,  # For async logging
+        colorize=False,  # No colors in file logs
+    )
 
-    formatter = logzero.LogFormatter(fmt=log_fmt)
-    logzero.setup_default_logger(formatter=formatter)
-    logzero.loglevel(level)
-    logzero.logfile(path, loglevel=level, maxBytes=1e9, backupCount=3, formatter=formatter)
+    # Map standard logging levels to loguru levels
+    # This is a basic example; you might need a more comprehensive mapping
+    logging_level_map = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "CRITICAL": logging.CRITICAL,
+    }
+    effective_level = logging_level_map.get(level.upper(), logging.INFO)
+
+    # Intercept standard logging
+    class InterceptHandler(logging.Handler):
+        def emit(self, record):
+            # Get corresponding Loguru level if it exists
+            try:
+                level = logger.level(record.levelname).name
+            except ValueError:
+                level = record.levelno
+
+            # Find caller from where originated the logged message
+            frame, depth = logging.currentframe(), 2
+            while frame.f_code.co_filename == logging.__file__:
+                frame = frame.f_back
+                depth += 1
+
+            logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
+
+    logging.basicConfig(handlers=[InterceptHandler()], level=effective_level, force=True)
 
 
-setup_logzero()
+setup_loguru()

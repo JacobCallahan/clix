@@ -23,7 +23,7 @@ classifiers = [
 dependencies = [
     "asyncssh", 
     "click",
-    "logzero", 
+    "loguru",
     "packaging", 
     "pyyaml", 
     "setuptools",

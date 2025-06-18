@@ -3,7 +3,7 @@ from pathlib import Path
 import time
 
 import asyncssh
-from logzero import logger
+from loguru import logger
 import yaml
 
 from clix import helpers

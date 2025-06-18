@@ -7,7 +7,7 @@ Parser classes must currently implement the following methods:
 
 Additionally, each parser class must have a suffix
 """
-from logzero import logger
+from loguru import logger
 
 
 class Hammer:

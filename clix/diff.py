@@ -1,7 +1,7 @@
 """Determine the changes between two cli versions."""
 from pathlib import Path
 
-from logzero import logger
+from loguru import logger
 import yaml
 
 from clix.helpers import get_latest, get_previous, load_cli

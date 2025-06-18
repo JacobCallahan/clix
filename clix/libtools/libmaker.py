@@ -1,6 +1,6 @@
 """This module provides the capability to create a new hammer version."""
 
-from logzero import logger
+from loguru import logger
 
 from clix import helpers
 from clix.libtools import hammer, subman

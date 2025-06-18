@@ -1,7 +1,7 @@
 """This module provides the capability to create a new hammer version."""
 from pathlib import Path
 
-from logzero import logger
+from loguru import logger
 
 from clix.helpers import clean_keywords, shift_text
 

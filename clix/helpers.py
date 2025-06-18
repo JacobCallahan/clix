@@ -6,7 +6,7 @@ from time import sleep
 from uuid import uuid4
 
 import asyncssh
-from logzero import logger
+from loguru import logger
 from packaging.version import Version
 import yaml
 
